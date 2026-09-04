@@ -6,7 +6,7 @@ FormFlow Relay is an application-specific capability demo for an n8n-style AI le
 
 **Live demo:** https://formflow-relay-n8n-demo.vercel.app
 
-![FormFlow Relay workflow demo](./formflow-relay-demo.jpg)
+![FormFlow Relay AI + CRM workflow demo](./formflow-relay-ai-crm-demo.png)
 
 ## Live workflow
 
