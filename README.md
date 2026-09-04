@@ -1,6 +1,6 @@
 # FormFlow Relay
 
-FormFlow Relay is an application-specific capability demo for a small n8n automation: receive a Google Forms submission, validate required data, normalize it for Google Sheets, route by priority, send a Gmail notification, and expose failures for safe retry.
+FormFlow Relay is an application-specific capability demo for an n8n-style AI lead workflow: receive an inbound form, validate and normalize it, qualify intent with deterministic structured output shaped like a Claude node, prepare a GoHighLevel-style CRM update, route the lead, write a Google Sheets row, send a Gmail notification, and expose failures for safe retry.
 
 > This is a capability prototype built with realistic dummy data. It is not presented as previous paid client work and contains no client data or credentials.
 
@@ -17,7 +17,8 @@ The browser demo lets a reviewer:
 - confirm that invalid submissions stop before side effects;
 - see normalized rows appear in a Sheets-style table;
 - inspect the generated Gmail notification;
-- simulate a Google Sheets timeout and retry without duplicating the email.
+- simulate a Google Sheets timeout and retry without duplicating the email;
+- inspect a Claude-style lead score, intent rationale, route, and simulated GoHighLevel pipeline update.
 
 ## Architecture
 
@@ -26,7 +27,9 @@ flowchart LR
   A[Google Forms webhook] --> B{Required fields valid?}
   B -- No --> E[Stop and log validation error]
   B -- Yes --> C[Normalize data and assign priority]
-  C --> D[Append Google Sheets row]
+  C --> H[Claude-style lead qualification]
+  H --> I[GoHighLevel CRM route]
+  I --> D[Append Google Sheets row]
   D --> F[Send Gmail notification]
   D -. timeout .-> G[Capture error for retry]
 ```
@@ -52,7 +55,7 @@ The tests cover missing fields, malformed email, normalized Sheet rows, priority
 ## Production setup
 
 1. Import `n8n-workflow.json` into n8n.
-2. Add Google Sheets and Gmail OAuth credentials inside n8n—never in source control.
+2. Add Anthropic/Claude, GoHighLevel, Google Sheets, and Gmail credentials inside n8n—never in source control.
 3. Replace the placeholder Sheet ID and recipient.
 4. Map the real Google Form response fields.
 5. Add an error workflow or alert channel for failed executions.
@@ -68,4 +71,4 @@ The tests cover missing fields, malformed email, normalized Sheet rows, priority
 
 ## Limitations
 
-The public demo simulates Google services while preserving the workflow rules. Final production activation requires client-owned Google and n8n credentials after contract start.
+The public demo simulates Claude, GoHighLevel, and Google services while preserving the workflow rules. Final production activation requires client-owned Anthropic, GoHighLevel, Google, and n8n credentials after contract start.

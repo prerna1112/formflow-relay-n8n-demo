@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { buildNotification, normalizeSubmission, processSubmission, validateSubmission } from "../workflow.js";
+import { buildNotification, buildCrmUpdate, normalizeSubmission, processSubmission, routeLead, scoreLead, validateSubmission } from "../workflow.js";
 
 const valid = { fullName: " Maya Chen ", email: "MAYA@EXAMPLE.COM", requestType: "Urgent support", notes: "Help" };
 
@@ -33,6 +33,15 @@ test("captures a retryable Sheets failure without producing a notification", () 
   assert.equal(result.notification, undefined);
 });
 
+test("scores an automation lead and prepares a CRM route", () => {
+  const qualification = scoreLead({ requestType: "New inquiry", notes: "Need lead qualification automation and CRM integration demo" });
+  assert.equal(qualification.intent, "High-intent");
+  assert.equal(routeLead(qualification), "sales-hot");
+  const update = buildCrmUpdate(normalizeSubmission({ ...valid, requestType: "New inquiry" }), qualification);
+  assert.equal(update.stage, "Sales qualified");
+  assert.equal(update.customFields.leadScore, qualification.score);
+});
+
 test("ships an importable n8n workflow covering the requested integrations and validation", () => {
   const artifact = JSON.parse(readFileSync(new URL("../n8n-workflow.json", import.meta.url), "utf8"));
   const nodeNames = artifact.nodes.map((node) => node.name);
@@ -42,6 +51,8 @@ test("ships an importable n8n workflow covering the requested integrations and v
     "Google Forms Webhook",
     "Validate Required Fields",
     "Normalize and Route",
+    "Claude Lead Qualification",
+    "GoHighLevel CRM Update",
     "Add Google Sheet Row",
     "Send Gmail Notification",
     "Validation Error"

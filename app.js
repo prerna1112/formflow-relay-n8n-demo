@@ -8,6 +8,8 @@ const nodes = [...document.querySelectorAll("[data-node]")];
 const eventLog = document.querySelector("#event-log");
 const sheetBody = document.querySelector("#sheet-body");
 const emailPreview = document.querySelector("#email-preview");
+const qualificationPreview = document.querySelector("#qualification-preview");
+const crmPreview = document.querySelector("#crm-preview");
 const retryButton = document.querySelector("#retry-button");
 const toast = document.querySelector("#toast");
 let lastPayload = null;
@@ -26,6 +28,9 @@ function resetRun() {
   retryButton.hidden = true;
   emailPreview.classList.add("empty");
   emailPreview.innerHTML = "<span>No message generated yet.</span>";
+  qualificationPreview.classList.add("empty");
+  qualificationPreview.innerHTML = "<span>Run the workflow to score intent and choose a route.</span>";
+  crmPreview.innerHTML = "<small>GoHighLevel CRM update</small><strong>Waiting for a qualified lead</strong><span>Tags, pipeline stage, and next action appear here.</span>";
 }
 
 function log(message, tone = "neutral") {
@@ -72,6 +77,10 @@ async function run(payload, failure = false) {
   log(`Conditional route selected: ${payload.requestType === "Urgent support" ? "high-priority" : "standard"}.`);
   await wait(420);
   setNode("route", "success");
+  qualificationPreview.classList.remove("empty");
+  qualificationPreview.innerHTML = `<div class="score-ring"><strong>${result.qualification.score}</strong><small>/ 100</small></div><div><b>${result.qualification.intent}</b><span>${result.qualification.rationale}</span><em>Route: ${result.leadRoute}</em></div>`;
+  crmPreview.innerHTML = `<small>GoHighLevel CRM update · simulated</small><strong>${result.crmUpdate.stage}</strong><span>${result.crmUpdate.tags.map((tag) => `#${tag}`).join(" ")}</span><em>${result.crmUpdate.nextAction}</em>`;
+  log(`Claude-style lead score ${result.qualification.score}/100 → ${result.leadRoute}; CRM update prepared.`);
 
   setNode("sheet", "running");
   log("Writing a normalized row to Google Sheets.");
