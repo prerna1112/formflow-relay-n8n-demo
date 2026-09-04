@@ -1,0 +1,20 @@
+{
+  "name": "Google Forms to Sheets and Gmail - Capability Demo",
+  "nodes": [
+    { "parameters": { "httpMethod": "POST", "path": "form-submission", "responseMode": "lastNode" }, "name": "Google Forms Webhook", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 0] },
+    { "parameters": { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ $json.email }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" }], "combinator": "and" } }, "name": "Validate Required Fields", "type": "n8n-nodes-base.if", "typeVersion": 2.2, "position": [240, 0] },
+    { "parameters": { "assignments": { "assignments": [{ "name": "priority", "value": "={{ $json.requestType === 'Urgent support' ? 'High' : 'Normal' }}", "type": "string" }] } }, "name": "Normalize and Route", "type": "n8n-nodes-base.set", "typeVersion": 3.4, "position": [480, -80] },
+    { "parameters": { "operation": "append", "documentId": "REPLACE_WITH_SHEET_ID", "sheetName": "Submissions" }, "name": "Add Google Sheet Row", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [720, -80], "credentials": { "googleSheetsOAuth2Api": { "id": "REPLACE_IN_N8N", "name": "Google Sheets account" } } },
+    { "parameters": { "sendTo": "operations@example.com", "subject": "=[{{$json.priority}}] New form submission", "message": "=New request from {{$json.fullName}} ({{$json.email}})." }, "name": "Send Gmail Notification", "type": "n8n-nodes-base.gmail", "typeVersion": 2.1, "position": [960, -80], "credentials": { "gmailOAuth2": { "id": "REPLACE_IN_N8N", "name": "Gmail account" } } },
+    { "parameters": { "errorMessage": "Required form fields are missing" }, "name": "Validation Error", "type": "n8n-nodes-base.stopAndError", "typeVersion": 1, "position": [480, 120] }
+  ],
+  "connections": {
+    "Google Forms Webhook": { "main": [[{ "node": "Validate Required Fields", "type": "main", "index": 0 }]] },
+    "Validate Required Fields": { "main": [[{ "node": "Normalize and Route", "type": "main", "index": 0 }], [{ "node": "Validation Error", "type": "main", "index": 0 }]] },
+    "Normalize and Route": { "main": [[{ "node": "Add Google Sheet Row", "type": "main", "index": 0 }]] },
+    "Add Google Sheet Row": { "main": [[{ "node": "Send Gmail Notification", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "saveDataErrorExecution": "all", "saveDataSuccessExecution": "all" },
+  "meta": { "templateCredsSetupCompleted": false },
+  "active": false
+}
