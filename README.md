@@ -4,6 +4,10 @@ FormFlow Relay is an application-specific capability demo for a small n8n automa
 
 > This is a capability prototype built with realistic dummy data. It is not presented as previous paid client work and contains no client data or credentials.
 
+**Live demo:** https://formflow-relay-n8n-demo.vercel.app
+
+![FormFlow Relay workflow demo](./formflow-relay-demo.jpg)
+
 ## Live workflow
 
 The browser demo lets a reviewer:
