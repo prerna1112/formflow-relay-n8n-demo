@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Interactive n8n-style Google Forms to Sheets and Gmail automation demo." />
+    <title>FormFlow Relay — Workflow Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#">FormFlow <span>Relay</span></a>
+      <div class="topbar-right"><span class="live-dot"></span> Interactive capability demo</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">GOOGLE WORKSPACE AUTOMATION</p>
+          <h1>From form response to organized follow-up—automatically.</h1>
+          <p class="lede">A working vertical slice of an n8n workflow that validates Google Form submissions, normalizes a Sheet row, routes by priority, and prepares a Gmail notification with safe failure handling.</p>
+        </div>
+        <aside class="proof-card">
+          <span>Workflow coverage</span>
+          <strong>5 nodes · 2 branches</strong>
+          <div><b>✓</b> validation <b>✓</b> retry-safe errors</div>
+        </aside>
+      </section>
+
+      <section class="workspace">
+        <article class="panel intake-panel">
+          <div class="panel-heading"><div><span class="step">01</span><h2>Test submission</h2></div><span class="tag">Google Forms</span></div>
+          <form id="intake-form" novalidate>
+            <label>Full name<input name="fullName" value="Maya Chen" /></label>
+            <label>Email<input name="email" type="email" value="maya@example.com" /></label>
+            <label>Request type<select name="requestType"><option>New inquiry</option><option>Urgent support</option><option>Partnership</option></select></label>
+            <label>Notes<textarea name="notes" rows="3">Please send the onboarding information.</textarea></label>
+            <label class="failure-toggle"><input id="simulate-failure" type="checkbox" /> Simulate a Google Sheets timeout</label>
+            <button id="run-workflow" class="primary" type="submit">Run workflow <span>→</span></button>
+          </form>
+        </article>
+
+        <article class="panel workflow-panel">
+          <div class="panel-heading"><div><span class="step">02</span><h2>Execution map</h2></div><span id="status-pill" class="status-pill">Ready</span></div>
+          <div class="flow">
+            <div class="node" data-node="trigger" data-state="waiting"><i>G</i><div><small>TRIGGER</small><strong>New form response</strong></div><span class="node-state">waiting</span></div>
+            <div class="connector"></div>
+            <div class="node" data-node="validate" data-state="waiting"><i>✓</i><div><small>VALIDATE</small><strong>Required fields</strong></div><span class="node-state">waiting</span></div>
+            <div class="connector"></div>
+            <div class="node" data-node="route" data-state="waiting"><i>◆</i><div><small>IF / ELSE</small><strong>Priority router</strong></div><span class="node-state">waiting</span></div>
+            <div class="connector split"></div>
+            <div class="flow-grid">
+              <div class="node" data-node="sheet" data-state="waiting"><i>S</i><div><small>ACTION</small><strong>Add Sheet row</strong></div><span class="node-state">waiting</span></div>
+              <div class="node" data-node="gmail" data-state="waiting"><i>M</i><div><small>ACTION</small><strong>Send Gmail alert</strong></div><span class="node-state">waiting</span></div>
+            </div>
+          </div>
+          <button id="retry-button" class="secondary" hidden>Retry failed execution</button>
+          <ol id="event-log" class="event-log"><li><time>—</time><span>Run the workflow to inspect each step.</span></li></ol>
+        </article>
+      </section>
+
+      <section class="results-grid">
+        <article class="panel wide">
+          <div class="panel-heading"><div><span class="step">03</span><h2>Google Sheets output</h2></div><span class="tag green">Normalized</span></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Request</th><th>Priority</th><th>Status</th></tr></thead><tbody id="sheet-body"><tr><td>FF-102841</td><td>Jordan Lee</td><td>Partnership</td><td><span class="priority normal">Normal</span></td><td>Received</td></tr></tbody></table></div>
+        </article>
+        <article class="panel">
+          <div class="panel-heading"><div><span class="step">04</span><h2>Gmail notification</h2></div><span class="tag red">Draft preview</span></div>
+          <div id="email-preview" class="email-preview empty"><span>No message generated yet.</span></div>
+        </article>
+      </section>
+    </main>
+    <div id="toast" class="toast" role="status"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
